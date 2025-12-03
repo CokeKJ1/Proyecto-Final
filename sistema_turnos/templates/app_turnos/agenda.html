@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agenda de Empleados{% endblock %}
+
+{% block content %}
+<h3>Selecciona un Empleado</h3>
+<form method="get" action="{% url 'agenda_empleado' %}" class="form-group" style="display: flex; gap: 10px;">
+    <select name="empleado_id" style="flex-grow: 1; padding: 10px;">
+        <option value="">-- Seleccionar Empleado --</option>
+        {% for emp in empleados %}
+            <option value="{{ emp.id }}" {% if empleado_seleccionado and emp.id == empleado_seleccionado.id %}selected{% endif %}>
+                {{ emp.nombre }} {{ emp.apellido }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn-submit">Ver Agenda</button>
+</form>
+
+{% if empleado_seleccionado %}
+    <h3 style="margin-top: 20px;">Agenda de Turnos para {{ empleado_seleccionado.nombre }} {{ empleado_seleccionado.apellido }}</h3>
+
+    {% if agenda %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Fin Estimado</th>
+                    <th>Cliente</th>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turno in agenda %}
+                <tr>
+                    <td>{{ turno.fecha_hora_inicio|date:"d M Y H:i" }}</td>
+                    <td>{{ turno.fecha_hora_fin|date:"H:i" }}</td>
+                    <td>{{ turno.cliente.nombre }} {{ turno.cliente.apellido }}</td>
+                    <td>{{ turno.servicio.nombre }}</td>
+                    <td><span style="color: green;">{{ turno.get_estado_display }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay turnos reservados o pendientes para {{ empleado_seleccionado.nombre }} en el futuro cercano.</p>
+    {% endif %}
+
+{% else %}
+    <p style="margin-top: 20px;">Por favor, selecciona un empleado en la lista para ver su agenda.</p>
+{% endif %}
+{% endblock %}

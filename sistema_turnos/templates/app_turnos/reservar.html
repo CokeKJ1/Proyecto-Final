@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reservar Turno{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    
+    <h3>Datos del Cliente</h3>
+    <!-- ClienteForm: Nombre, Apellido, Teléfono, Email -->
+    {% for field in cliente_form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small style="color: #666;">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <h3>Detalles del Turno</h3>
+    <!-- TurnoReservaForm: Empleado, Servicio, Fecha/Hora -->
+    {% for field in reserva_form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small style="color: #666;">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+                <p style="color: red;">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn-submit">Confirmar Reserva</button>
+</form>
+
+<script>
+    // Pequeño script para configurar el input datetime-local
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('id_fecha_hora_inicio');
+        if (input) {
+            // Obtener la fecha y hora actual en formato YYYY-MM-DDTHH:mm (formato requerido por datetime-local)
+            var now = new Date();
+            var offset = now.getTimezoneOffset() * 60000;
+            var localIsoDate = new Date(now - offset).toISOString().slice(0, 16);
+            
+            // Establecer el valor mínimo para evitar reservas en el pasado
+            input.setAttribute('min', localIsoDate);
+        }
+    });
+</script>
+{% endblock %}
